@@ -1,0 +1,30 @@
+{% extends "core/base.html" %}
+{% load staticfiles %}
+{% block body_block %}
+  <div class="container">
+    <div class="jumbotron">
+      {% if tweeted %}
+        <h1>Thank you for tweeting!</h1>
+          {% for t in tweets_all %}
+          <li> {{ t }} </li>
+              <button>Like</button>
+              <br><br>
+          {% endfor %}
+      {% else %}
+        <h1>Write your tweet here!</h1>
+<form enctype="multipart/form-data" method="POST">
+          {% csrf_token %}
+          {{ tweet_form.as_p }}
+          <input type="submit" name="" value="Post">
+        </form>
+          {% for t in tweets_all %}
+          <li> {{ t }} </li>
+              <button>Like</button>
+              <br><br>
+          {% endfor %}
+
+      {% endif %}
+
+    </div>
+  </div>
+{% endblock %}

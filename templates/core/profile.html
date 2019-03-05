@@ -1,0 +1,15 @@
+{% extends "core/base.html" %}
+{% block body_block %}
+<div class="container">
+  <div class="jumbotron">
+    <h1>{{ profile_user.user.username }}</h1>
+        <p> BIO: {{ profile_user.bio }} </p>
+  <button>FOLLOW</button>
+      <h3>TWEETS</h3><br>
+      {% for t in all_tweets %}
+          <li><p> {{ t }} </p></li><br>
+      {% endfor %}
+
+  </div>
+</div>
+{% endblock %}

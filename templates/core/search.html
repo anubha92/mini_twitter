@@ -1,0 +1,16 @@
+{% extends 'core/base.html' %}
+{% block body_block %}
+  <div class="container">
+    <div class="jumbotron">
+      <h1>Search here :</h1>
+<form method="post" action="{% url 'core:home' %}">
+          {% csrf_token %}
+<label for="search">List of users:</label>
+          {% for u in user_list %}
+              <li><p>ID:{{ u.user_id }}</p>
+                  <a href="{%  url 'core:get_profile' pk=u.user_id %}"><p>Name : {{ u.user }}</p></a></li>
+            {% endfor %}
+</form>
+</div>
+  </div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "core/base.html" %}
+{% block body_block %}
+<div class="container">
+  <div class="jumbotron">
+    <h1>Welcome {{ user.username }}</h1>
+        <p> BIO: {{ bio }} </p>
+  </div>
+</div>
+{% endblock %}
