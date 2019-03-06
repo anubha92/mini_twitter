@@ -1,10 +1,15 @@
 {% extends "core/base.html" %}
 {% block body_block %}
-<div class="container">
+<div class="container" xmlns="http://www.w3.org/1999/html">
   <div class="jumbotron">
     <h1>{{ profile_user.user.username }}</h1>
         <p> BIO: {{ profile_user.bio }} </p>
-  <button>FOLLOW</button>
+  <form method="post" action="{% url 'core:get_profile' pk=profile_user.user_id %}">
+      {% csrf_token %}
+  <input type="submit" name="" value="FOLLOW">
+  </form>
+      <a href="{%  url 'core:get_followers' pk=profile_user.user_id %}" ><h3>Followers</h3></a>
+      <a href="{%  url 'core:get_following' pk=profile_user.user_id %}" ><h3>Following</h3></a>
       <h3>TWEETS</h3><br>
       {% for t in all_tweets %}
           <li><p> {{ t }} </p></li><br>

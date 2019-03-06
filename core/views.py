@@ -1,15 +1,14 @@
-from django.shortcuts import render, redirect
-from django.shortcuts import render_to_response
-from django.template import RequestContext
-from django.utils.html import escape
-
-from core.models import UserProfileInfo, Tweets
-from .forms import UserForm, UserProfileInfoForm, TweetsForm
+from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserChangeForm
+
+
+from core.models import UserProfileInfo, Tweets, Followers
+from .forms import UserForm, UserProfileInfoForm, TweetsForm
+
 
 # Create your views here.
 
@@ -46,20 +45,6 @@ def register(request):
                    'profile_form': profile_form,
                    'registered': registered})
 
-'''
-def user_login(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(username=username, password=password)
-        if user:
-            login(request, user)
-            user_pref = UserProfileInfo.objects.get(user=user)
-            return HttpResponseRedirect(reverse('home'))
-        else:
-            return HttpResponse("Invalid login details given")
-    else:
-        return render(request, 'core/login.html', {})'''
 
 def home(request):
     if request.method == 'POST':
@@ -100,7 +85,30 @@ def search_profile(request):
     user_list = UserProfileInfo.objects.all()
     return render(request, 'core/search.html', {'user_list': user_list})
 
+
 def get_profile(request, pk):
     u = UserProfileInfo.objects.get(user_id=pk)
     t = Tweets.objects.filter(user_id=pk).order_by('-published_time')
+    if request.method == 'POST':
+        data = Followers.objects.filter(follow=User(u.user_id), user=request.user).count()
+        if data == 0:
+                if request.user != User(u.user_id):
+                    f = Followers( follow=User(u.user_id), user=request.user)
+                    f.save()
+                else:
+                    return HttpResponse("You cannot follow yourself")
+        else:
+            return HttpResponse("Already followed")
     return render(request, 'core/profile.html', {'profile_user':u, 'all_tweets':t})
+
+
+def get_followers(request, pk):
+    u = UserProfileInfo.objects.get(user_id=pk)
+    follower = Followers.objects.filter(follow=User(u.user_id))
+    return render(request, 'core/follower.html', {'all_followers':follower, 'profile_user':u})
+
+
+def get_following(request, pk):
+    u = UserProfileInfo.objects.get(user_id=pk)
+    following = Followers.objects.filter(user=User(u.user_id))
+    return render(request, 'core/following.html', {'all_following':following, 'profile_user':u })
