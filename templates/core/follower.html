@@ -5,7 +5,7 @@
     <h1>{{ profile_user.user.username }}</h1>
   <h3>Followers</h3>
       {% for f in all_followers %}
-          <li><a href="{%  url 'core:get_profile' pk=profile_user.user_id %}" >{{ f.user.username }}</a></li><br>
+          <li><a href="{%  url 'core:get_profile' pk=f.user_id %}" >{{ f.user.username }}</a></li><br>
       {% endfor %}
   </div>
 </div>
