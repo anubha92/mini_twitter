@@ -89,7 +89,7 @@ def post_tweet(request):
             print("Tweetform invalid")
     else:
         tweet_form = TweetsForm()
-    tweets_all = Tweets.objects.filter(user=user)
+    tweets_all = Tweets.objects.filter(user=user).order_by('-published_time')
     return render(request, 'core/mytweets.html',
                   {'tweet_form': tweet_form,
                    'tweets_all' : tweets_all,
@@ -102,5 +102,5 @@ def search_profile(request):
 
 def get_profile(request, pk):
     u = UserProfileInfo.objects.get(user_id=pk)
-    t = Tweets.objects.filter(user_id=pk)
+    t = Tweets.objects.filter(user_id=pk).order_by('-published_time')
     return render(request, 'core/profile.html', {'profile_user':u, 'all_tweets':t})

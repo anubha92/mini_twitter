@@ -9,6 +9,6 @@ urlpatterns=[
     url(r'^home/$', views.home, name='home'),
    # url(r'^home/edit/$', views.edit_profile, name='edit_profile'),
     url(r'^home/tweet/$', views.post_tweet, name='post_tweet'),
-    url(r'^home/profile/(?P<pk>[\w\-]+)/$', views.get_profile, name='get_profile'),
+    url(r'^profile/(?P<pk>[\w\-]+)/$', views.get_profile, name='get_profile'),
     url(r'^home/search/$', views.search_profile, name='search_profile')
 ]

@@ -13,7 +13,7 @@
 
           <li><a class="navbar-brand" href="{% url 'index' %}">DJANGO</a></li>
           <li><a class="navbar-link" href="{% url 'admin:index' %}">Admin</a></li>
-          <li><a class="navbar-link" href="{% url 'core:register' %}">Register</a></li>
+
           {# Some logic on what to display for last item#}
           {% if user.is_authenticated %}
             <li><a href="{% url 'logout' %}">Logout</a></li>
@@ -22,6 +22,7 @@
 
           {% else %}
             <li><a class="navbar-link" href="{% url 'core:home' %}">Login</a></li>
+              <li><a class="navbar-link" href="{% url 'core:register' %}">Register</a></li>
           {% endif %}
 </ul>
       </div>
