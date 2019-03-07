@@ -1,0 +1,12 @@
+{% extends "core/base.html" %}
+{% block body_block %}
+<div class="container" xmlns="http://www.w3.org/1999/html">
+  <div class="jumbotron">
+  <form method="POST" action="{% url 'core:edit_bio' %}">
+      {% csrf_token %}
+      <input type="text" name="updated_bio" value="">
+      <input type="submit" name="" value="submit">
+  </form>
+  </div>
+</div>
+{% endblock %}

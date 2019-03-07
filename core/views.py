@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.db.models import F
 
 
 from core.models import UserProfileInfo, Tweets, Followers
@@ -112,3 +113,24 @@ def get_following(request, pk):
     u = UserProfileInfo.objects.get(user_id=pk)
     following = Followers.objects.filter(user=User(u.user_id))
     return render(request, 'core/following.html', {'all_following':following, 'profile_user':u })
+
+def timeline(request):
+    u=request.user
+    my_tweets = Tweets.objects.filter(user=u)
+    following = Followers.objects.filter(user=u)
+    for f in following:
+        f_tweets = Tweets.objects.filter(user=f.follow)
+        my_tweets = my_tweets | f_tweets
+    my_tweets= my_tweets.order_by('-published_time')
+    return render(request, 'core/timeline.html',{'my_tweets': my_tweets})
+
+def edit_bio(request):
+    if request.method == 'POST':
+        u = request.user
+        updated_bio = request.POST.get('updated_bio')
+        b = UserProfileInfo.objects.get(user=u)
+        b.bio = updated_bio
+        b.save()
+        return HttpResponse("Bio has been updated")
+    else:
+        return render(request, 'core/edit_bio.html', {})

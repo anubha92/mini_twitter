@@ -1,0 +1,12 @@
+{% extends "core/base.html" %}
+{% block body_block %}
+<div class="container" xmlns="http://www.w3.org/1999/html">
+  <div class="jumbotron">
+  <h3>Timeline</h3>
+      {% for t in my_tweets %}
+
+          <li>{{ t.user.username }}<br>{{ t.contents }}<br>{{ t.published_time }}</li><br><br>
+      {% endfor %}
+  </div>
+</div>
+{% endblock %}
