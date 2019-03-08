@@ -13,8 +13,8 @@ class UserProfileInfo(models.Model):
         return str(self.user.username) + str(self.bio)
 
 
-class Tweets(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE,blank=True,null=True, related_name='tweets')
+class Tweet(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tweets')
     contents = models.CharField(max_length=120)
     published_time = models.DateTimeField(auto_now_add=True)
 
@@ -22,9 +22,9 @@ class Tweets(models.Model):
         return str(self.contents) + str(self.published_time)
 
 
-class Followers(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True,null=True, related_name='follower_user')
-    follow = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='follower_follower')
+class FollowRelation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
+    follow = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followed')
 
     def __str__(self):
-        return str(self.user),  str(self.follow)
+        return str(self.user) +  str(self.follow)

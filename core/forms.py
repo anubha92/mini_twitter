@@ -1,5 +1,5 @@
 from django import forms
-from .models import UserProfileInfo, Tweets
+from .models import UserProfileInfo, Tweet
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm
 
@@ -18,5 +18,5 @@ class UserProfileInfoForm(forms.ModelForm):
 
 class TweetsForm(forms.ModelForm):
     class Meta():
-        model = Tweets
+        model = Tweet
         fields=('contents',)

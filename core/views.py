@@ -4,10 +4,10 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.db.models import F
 
 
-from core.models import UserProfileInfo, Tweets, Followers
+
+from core.models import UserProfileInfo, Tweet, FollowRelation
 from .forms import UserForm, UserProfileInfoForm, TweetsForm
 
 
@@ -75,7 +75,7 @@ def post_tweet(request):
             print("Tweetform invalid")
     else:
         tweet_form = TweetsForm()
-    tweets_all = Tweets.objects.filter(user=user).order_by('-published_time')
+    tweets_all = Tweet.objects.filter(user=user).order_by('-published_time')
     return render(request, 'core/mytweets.html',
                   {'tweet_form': tweet_form,
                    'tweets_all' : tweets_all,
@@ -89,12 +89,12 @@ def search_profile(request):
 
 def get_profile(request, pk):
     u = UserProfileInfo.objects.get(user_id=pk)
-    t = Tweets.objects.filter(user_id=pk).order_by('-published_time')
+    t = Tweet.objects.filter(user_id=pk).order_by('-published_time')
     if request.method == 'POST':
-        data = Followers.objects.filter(follow=User(u.user_id), user=request.user).count()
+        data = FollowRelation.objects.filter(follow=User(u.user_id), user=request.user).count()
         if data == 0:
                 if request.user != User(u.user_id):
-                    f = Followers( follow=User(u.user_id), user=request.user)
+                    f = FollowRelation( follow=User(u.user_id), user=request.user)
                     f.save()
                 else:
                     return HttpResponse("You cannot follow yourself")
@@ -105,21 +105,21 @@ def get_profile(request, pk):
 
 def get_followers(request, pk):
     u = UserProfileInfo.objects.get(user_id=pk)
-    follower = Followers.objects.filter(follow=User(u.user_id))
+    follower = FollowRelation.objects.filter(follow=User(u.user_id))
     return render(request, 'core/follower.html', {'all_followers':follower, 'profile_user':u})
 
 
 def get_following(request, pk):
     u = UserProfileInfo.objects.get(user_id=pk)
-    following = Followers.objects.filter(user=User(u.user_id))
+    following = FollowRelation.objects.filter(user=User(u.user_id))
     return render(request, 'core/following.html', {'all_following':following, 'profile_user':u })
 
 def timeline(request):
     u=request.user
-    my_tweets = Tweets.objects.filter(user=u)
-    following = Followers.objects.filter(user=u)
+    my_tweets = Tweet.objects.filter(user=u)
+    following = FollowRelation.objects.filter(user=u)
     for f in following:
-        f_tweets = Tweets.objects.filter(user=f.follow)
+        f_tweets = Tweet.objects.filter(user=f.follow)
         my_tweets = my_tweets | f_tweets
     my_tweets= my_tweets.order_by('-published_time')
     return render(request, 'core/timeline.html',{'my_tweets': my_tweets})
