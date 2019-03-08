@@ -104,15 +104,15 @@ def get_profile(request, pk):
 
 
 def get_followers(request, pk):
-    u = UserProfileInfo.objects.get(user_id=pk)
-    follower = FollowRelation.objects.filter(follow=User(u.user_id))
-    return render(request, 'core/follower.html', {'all_followers':follower, 'profile_user':u})
+    user_profile = UserProfileInfo.objects.get(user_id=pk)
+    u = User.objects.get(username=user_profile.user.username)
+    return render(request, 'core/follower.html', {'all_followers':u.followed.all(), 'profile_user':u})
 
 
-def get_following(request, pk):
-    u = UserProfileInfo.objects.get(user_id=pk)
-    following = FollowRelation.objects.filter(user=User(u.user_id))
-    return render(request, 'core/following.html', {'all_following':following, 'profile_user':u })
+def get_following(request,pk):
+    user_profile = UserProfileInfo.objects.get(user_id=pk)
+    u = User.objects.get(username=user_profile.user.username)
+    return render(request, 'core/following.html', {'all_following':u.following.all(), 'profile_user':user_profile })
 
 def timeline(request):
     u=request.user
