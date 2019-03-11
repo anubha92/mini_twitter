@@ -8,7 +8,7 @@
 <label for="search">List of users:</label>
           {% for u in user_list %}
               <li><p>ID:{{ u.user_id }}</p>
-                  <a href="{%  url 'core:get_profile' pk=u.user_id %}"><p>Name : {{ u.user }}</p></a></li>
+                  <a href="{%  url 'core:get_profile' userid=u.user_id %}"><p>Name : {{ u.user }}</p></a></li>
             {% endfor %}
 </form>
 </div>

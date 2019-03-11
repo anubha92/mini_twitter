@@ -81,10 +81,10 @@ def search_profile(request):
     return render(request, 'core/search.html', {'user_list': user_list})
 
 
-def get_profile(request, pk):
+def get_profile(request, userid):
     followed = False
-    u = UserProfileInfo.objects.get(user_id=pk)
-    t = Tweet.objects.filter(user_id=pk)
+    u = UserProfileInfo.objects.get(user_id=userid)
+    t = Tweet.objects.filter(user_id=userid)
     if request.method == 'POST':
         data = FollowRelation.objects.filter(follow=User(u.user_id), user=request.user).count()
         if data == 0:
@@ -99,14 +99,14 @@ def get_profile(request, pk):
     return render(request, 'core/profile.html', {'profile_user':u, 'all_tweets':t, 'followed':followed})
 
 
-def get_followers(request, pk):
-    user_profile = UserProfileInfo.objects.get(user_id=pk)
+def get_followers(request, userid):
+    user_profile = UserProfileInfo.objects.get(user_id=userid)
     u = User.objects.get(username=user_profile.user.username)
     return render(request, 'core/follower.html', {'all_followers':u.followed.all(), 'profile_user':u})
 
 
-def get_following(request,pk):
-    user_profile = UserProfileInfo.objects.get(user_id=pk)
+def get_following(request,userid):
+    user_profile = UserProfileInfo.objects.get(user_id=userid)
     u = User.objects.get(username=user_profile.user.username)
     return render(request, 'core/following.html', {'all_following':u.following.all(), 'profile_user':user_profile })
 

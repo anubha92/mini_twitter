@@ -4,7 +4,7 @@
   <div class="jumbotron">
   <h3>Following</h3>
       {% for f in all_following %}
-          <li><a href="{%  url 'core:get_profile' pk=f.follow_id %}" >{{ f.follow.username }}</a></li><br>
+          <li><a href="{%  url 'core:get_profile' userid=f.follow_id %}" >{{ f.follow.username }}</a></li><br>
       {% endfor %}
   </div>
 </div>
