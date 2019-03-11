@@ -62,16 +62,14 @@ def home(request):
         return render(request, 'core/login.html', {})
 
 def post_tweet(request):
+    u = request.user
     if request.method == 'POST':
-        u = request.user
         new_tweet = request.POST.get('submit_tweet')
-        print(new_tweet)
         t = Tweet.objects.create(contents=new_tweet, user=u)
-        tweets_all = Tweet.objects.filter(user=u).order_by('-published_time')
+        tweets_all = u.tweets.all()
         return render(request, 'core/mytweets1.html',{'tweets_all':tweets_all})
     else:
-        u = request.user
-        tweets_all = Tweet.objects.filter(user=u).order_by('-published_time')
+        tweets_all = u.tweets.all()
         return render(request, 'core/mytweets1.html',{'tweets_all':tweets_all})
 
 
@@ -85,7 +83,7 @@ def search_profile(request):
 def get_profile(request, pk):
     followed = False
     u = UserProfileInfo.objects.get(user_id=pk)
-    t = Tweet.objects.filter(user_id=pk).order_by('-published_time')
+    t = Tweet.objects.filter(user_id=pk)
     if request.method == 'POST':
         data = FollowRelation.objects.filter(follow=User(u.user_id), user=request.user).count()
         if data == 0:
@@ -97,7 +95,6 @@ def get_profile(request, pk):
                     return HttpResponse("You cannot follow yourself")
         else:
             return HttpResponse("Already followed")
-    print(followed)
     return render(request, 'core/profile.html', {'profile_user':u, 'all_tweets':t, 'followed':followed})
 
 
@@ -115,12 +112,11 @@ def get_following(request,pk):
 
 def timeline(request):
     u=request.user
-    my_tweets = Tweet.objects.filter(user=u)
-    following = FollowRelation.objects.filter(user=u)
+    my_tweets = u.tweets.filter(user=u)
+    following = u.following.all()
     for f in following:
         f_tweets = Tweet.objects.filter(user=f.follow)
         my_tweets = my_tweets | f_tweets
-    my_tweets= my_tweets.order_by('-published_time')
     return render(request, 'core/timeline.html',{'my_tweets': my_tweets})
 
 
