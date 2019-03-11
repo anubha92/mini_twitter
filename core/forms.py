@@ -1,7 +1,6 @@
 from django import forms
-from .models import UserProfileInfo, Tweet
+from .models import User, Tweet, UserProfileInfo
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserChangeForm
 
 
 class UserForm(forms.ModelForm):
@@ -15,8 +14,3 @@ class UserProfileInfoForm(forms.ModelForm):
     class Meta():
         model = UserProfileInfo
         fields = ('bio',)
-
-class TweetsForm(forms.ModelForm):
-    class Meta():
-        model = Tweet
-        fields=('contents',)
