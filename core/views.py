@@ -68,10 +68,10 @@ def post_tweet(request):
         new_tweet = request.POST.get('submit_tweet')
         t = Tweet.objects.create(contents=new_tweet, user=u)
         tweets_all = u.tweets.all()
-        return render(request, 'core/mytweets1.html',{'tweets_all':tweets_all})
+        return render(request, 'core/mytweets.html',{'tweets_all':tweets_all})
     else:
         tweets_all = u.tweets.all()
-        return render(request, 'core/mytweets1.html',{'tweets_all':tweets_all})
+        return render(request, 'core/mytweets.html',{'tweets_all':tweets_all})
 
 
 
