@@ -112,8 +112,7 @@ def get_following(request,pk):
 
 
 def timeline(request):
-    following = request.user.following.all()
-    my_tweets = Tweet.objects.filter(Q(user = request.user) | Q(user__in = [f.follow for f in following]))
+    my_tweets = Tweet.objects.filter(Q(user=request.user) | Q(user__in=request.user.following.values_list('follow', flat=True)))
     return render(request, 'core/timeline.html',{'my_tweets': my_tweets})
 
 
