@@ -5,7 +5,11 @@
   <h3>Timeline</h3>
       {% for t in my_tweets %}
 
-          <li>{{ t.user.username }}<br>{{ t.contents }}<br>{{ t.published_time }}</li><br><br>
+          <li>{{ t.user.username }}<br>{{ t.contents }}<br>{{ t.published_time }}</li>
+          <form method="POST" action="{% url 'core:post_like' tweet_id=t.id %}" >
+          {% csrf_token %}
+                <input type="submit" value="Like">
+          </form><br><br>
       {% endfor %}
   </div>
 </div>

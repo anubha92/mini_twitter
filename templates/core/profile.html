@@ -12,7 +12,11 @@
       <a href="{%  url 'core:get_following' userid=profile_user.user_id %}" ><h3>Following</h3></a>
       <h3>TWEETS</h3><br>
       {% for t in all_tweets %}
-          <li><p> {{ t }} </p></li><br>
+          <li>{{ t }}</li><br>
+          <form method="POST" action="{% url 'core:post_like' tweet_id=t.id %}" >
+          {% csrf_token %}
+                <input type="submit" value="Like">
+          </form><br><br>
       {% endfor %}
 
   </div>

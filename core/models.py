@@ -30,3 +30,10 @@ class FollowRelation(models.Model):
 
     def __str__(self):
         return str(self.user) +  str(self.follow)
+
+class TweetLike(models.Model):
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE, related_name = 'tweet')
+    liked_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liked_by')
+
+    def __str__(self):
+        return str(self.liked_by.username)

@@ -8,10 +8,13 @@
       <input type="submit" name="" value="POST">
   </form>
       {% for t in tweets_all %}
-          <li> {{ t }} </li>
-              <button>Like</button>
+          <form method="POST" action="{% url 'core:post_like' tweet_id=t.id %}" >
+          {% csrf_token %}
+            <li> {{ t }} </li>
+                <input type="submit" value="Like">
+          </form>
               <br><br>
-          {% endfor %}
+      {% endfor %}
   </div>
 </div>
 {% endblock %}

@@ -8,7 +8,7 @@ from django.db.models import Q
 
 
 
-from core.models import User, Tweet, FollowRelation, UserProfileInfo
+from core.models import User, Tweet, FollowRelation, UserProfileInfo, TweetLike
 from .forms import UserForm, User, UserProfileInfoForm
 
 
@@ -97,6 +97,15 @@ def get_profile(request, userid):
         else:
             return HttpResponse("Already followed")
     return render(request, 'core/profile.html', {'profile_user':u, 'all_tweets':t, 'followed':followed})
+
+def post_like(request, tweet_id):
+    u = request.user
+    t = Tweet.objects.get(id=tweet_id)
+    new_t = TweetLike.objects.create(tweet=t, liked_by=u )
+    new_t.save()
+    all_likes = TweetLike.objects.filter(tweet=t)
+    return render(request, 'core/tweets_liked_by.html', {'all_likes': all_likes, 'tweet':t})
+
 
 
 def get_followers(request, userid):
