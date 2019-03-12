@@ -17,4 +17,5 @@ urlpatterns=[
     path('home/search/', views.search_profile, name='search_profile'),
     path('timeline/', views.timeline, name='timeline'),
     path('editbio/', views.edit_bio, name='edit_bio'),
+    path ('searchtweet/', views.search_tweet, name='search_tweet'),
 ]

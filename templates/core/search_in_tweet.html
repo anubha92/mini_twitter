@@ -1,0 +1,15 @@
+{% extends "core/base.html" %}
+{% block body_block %}
+<div class="container" xmlns="http://www.w3.org/1999/html">
+  <div class="jumbotron">
+  <form method="POST" action="{% url 'core:search_tweet' %}">
+      {% csrf_token %}
+      <input type="text" name="search_word" value="">
+      <input type="submit" name="" value="submit">
+  </form>
+      {% for t in tweets %}
+          <li>{{ t.contents }}<br>by:{{ t.user }}</li>
+      {% endfor %}
+  </div>
+</div>
+{% endblock %}

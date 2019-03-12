@@ -11,6 +11,23 @@
                 <input type="submit" value="Like">
           </form><br><br>
       {% endfor %}
+  <div class="pagination">
+    <span class="step-links">
+        {% if my_tweets.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ my_tweets.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ my_tweets.number }} of {{ my_tweets.paginator.num_pages }}.
+        </span>
+
+        {% if my_tweets.has_next %}
+            <a href="?page={{ my_tweets.next_page_number }}">next</a>
+            <a href="?page={{ my_tweets.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
   </div>
 </div>
 {% endblock %}

@@ -5,8 +5,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.db import IntegrityError
-
-
+from django.core.paginator import Paginator
 
 from core.models import Tweet, FollowRelation, UserProfileInfo, TweetLike
 from core.forms import User, UserCreationForm
@@ -127,7 +126,10 @@ def get_following(request,userid):
 
 
 def timeline(request):
-    my_tweets = Tweet.objects.filter(Q(user=request.user) | Q(user__in=request.user.following.values_list('follow', flat=True)))
+    total_tweets = Tweet.objects.filter(Q(user=request.user) | Q(user__in=request.user.following.values_list('follow', flat=True)))
+    paginator = Paginator(total_tweets, 3)
+    page = request.GET.get('page')
+    my_tweets = paginator.get_page(page)
     return render(request, 'core/timeline.html',{'my_tweets': my_tweets})
 
 
@@ -142,4 +144,11 @@ def edit_bio(request):
     else:
         return render(request, 'core/edit_bio.html', {})
 
+def search_tweet(request):
+    if request.method == 'POST':
+        lookup_word = request.POST.get('search_word')
+        tweets = Tweet.objects.filter(contents__icontains=lookup_word)
+        return render(request, 'core/search_in_tweet.html', {'tweets': tweets})
+    else:
+        return render(request, 'core/search_in_tweet.html', {})
 
