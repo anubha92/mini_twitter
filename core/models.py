@@ -32,8 +32,11 @@ class FollowRelation(models.Model):
         return str(self.user) +  str(self.follow)
 
 class TweetLike(models.Model):
-    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE, related_name = 'tweet')
-    liked_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liked_by')
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE, related_name = 'likes')
+    liked_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
 
     def __str__(self):
         return str(self.liked_by.username)
+
+    class Meta:
+        unique_together = ("tweet", "liked_by")

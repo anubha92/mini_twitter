@@ -1,15 +1,15 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.db import IntegrityError
 
 
 
-from core.models import User, Tweet, FollowRelation, UserProfileInfo, TweetLike
-from .forms import UserForm, User, UserProfileInfoForm
+from core.models import Tweet, FollowRelation, UserProfileInfo, TweetLike
+from core.forms import User, UserCreationForm
 
 
 # Create your views here.
@@ -27,24 +27,20 @@ def user_logout(request):
 def register(request):
     registered = False
     if request.method == 'POST':
-        user_form = UserForm(data=request.POST)
-        profile_form = UserProfileInfoForm(data=request.POST)
-        if user_form.is_valid() and profile_form.is_valid():
+        user_form = UserCreationForm(request.POST)
+        if user_form.is_valid():
             user = user_form.save()
-            user.set_password(user.password)
             user.save()
-            profile = profile_form.save(commit=False)
-            profile.user = user
+            bio = user_form.cleaned_data.get('bio')
+            profile = UserProfileInfo(user=user, bio=bio)
             profile.save()
             registered = True
         else:
-            print(user_form.errors, profile_form.errors)
+            print(user_form.errors)
     else:
-        user_form = UserForm()
-        profile_form = UserProfileInfoForm()
+        user_form = UserCreationForm()
     return render(request, 'core/registration.html',
                   {'user_form': user_form,
-                   'profile_form': profile_form,
                    'registered': registered})
 
 
@@ -94,7 +90,7 @@ def get_profile(request, userid):
             return render(request, 'core/profile.html',
                                   {'profile_user': u, 'all_tweets': t, 'followed': followed, 'me':request.user})
         else:
-            followed = True
+            followed = False
             return render(request, 'core/profile.html', {'profile_user': u, 'all_tweets': t, 'followed': followed, 'me':request.user})
     else:
         if request.method == 'POST':
@@ -108,8 +104,11 @@ def get_profile(request, userid):
 def post_like(request, tweet_id):
     u = request.user
     t = Tweet.objects.get(id=tweet_id)
-    new_t = TweetLike.objects.create(tweet=t, liked_by=u )
-    new_t.save()
+    try:
+        new_t = TweetLike.objects.create(tweet=t, liked_by=u )
+        new_t.save()
+    except IntegrityError:
+        return HttpResponse("already liked")
     all_likes = TweetLike.objects.filter(tweet=t)
     return render(request, 'core/tweets_liked_by.html', {'all_likes': all_likes, 'tweet':t})
 

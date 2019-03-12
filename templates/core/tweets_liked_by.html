@@ -2,7 +2,7 @@
 {% block body_block %}
 <div class="container" xmlns="http://www.w3.org/1999/html">
   <div class="jumbotron">
-  <h3>Tweet: {{ tweet }}</h3>
+  <h3>Tweet: {{ tweet.contents }}</h3><h4>{{ tweet.published_time }}</h4>
   <h4>Liked by ....</h4>
       {% for t in all_likes %}
           <li>{{ t.liked_by.username }}</li>
