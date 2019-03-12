@@ -85,18 +85,25 @@ def get_profile(request, userid):
     followed = False
     u = UserProfileInfo.objects.get(user_id=userid)
     t = Tweet.objects.filter(user_id=userid)
-    if request.method == 'POST':
-        data = FollowRelation.objects.filter(follow=User(u.user_id), user=request.user).count()
-        if data == 0:
-                if request.user != User(u.user_id):
-                    f = FollowRelation( follow=User(u.user_id), user=request.user)
-                    f.save()
-                    followed = True
-                else:
-                    return HttpResponse("You cannot follow yourself")
+    data = FollowRelation.objects.filter(follow=User(u.user_id), user=request.user).count()
+    if data == 0:
+        if request.method == 'POST':
+            f = FollowRelation( follow=User(u.user_id), user=request.user)
+            f.save()
+            followed = True
+            return render(request, 'core/profile.html',
+                                  {'profile_user': u, 'all_tweets': t, 'followed': followed, 'me':request.user})
         else:
-            return HttpResponse("Already followed")
-    return render(request, 'core/profile.html', {'profile_user':u, 'all_tweets':t, 'followed':followed})
+            followed = True
+            return render(request, 'core/profile.html', {'profile_user': u, 'all_tweets': t, 'followed': followed, 'me':request.user})
+    else:
+        if request.method == 'POST':
+            FollowRelation.objects.filter(follow=User(u.user_id), user=request.user).delete()
+            followed = False
+            return render(request, 'core/profile.html', {'profile_user': u, 'all_tweets': t, 'followed': followed, 'me':request.user})
+        else:
+            followed = False
+            return render(request, 'core/profile.html', {'profile_user': u, 'all_tweets': t, 'followed': followed, 'me':request.user})
 
 def post_like(request, tweet_id):
     u = request.user

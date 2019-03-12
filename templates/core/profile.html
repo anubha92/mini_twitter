@@ -6,7 +6,13 @@
         <p> BIO: {{ profile_user.bio }} </p>
   <form method="post" action="{% url 'core:get_profile' userid=profile_user.user_id %}">
       {% csrf_token %}
-  <input type="submit" name="" value="FOLLOW">
+  {%  ifnotequal profile_user.user  me  %}
+      {% if followed %}
+          <button>UNFOLLOW</button>
+      {% else %}
+        <button>FOLLOW</button>
+      {% endif %}
+  {% endifnotequal %}
   </form>
       <a href="{%  url 'core:get_followers' userid=profile_user.user_id %}" ><h3>Followers</h3></a>
       <a href="{%  url 'core:get_following' userid=profile_user.user_id %}" ><h3>Following</h3></a>
