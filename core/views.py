@@ -26,12 +26,13 @@ def user_logout(request):
 def register(request):
     registered = False
     if request.method == 'POST':
-        user_form = UserCreationForm(request.POST)
+        user_form = UserCreationForm(request.POST, request.FILES)
         if user_form.is_valid():
             user = user_form.save()
             user.save()
             bio = user_form.cleaned_data.get('bio')
-            profile = UserProfileInfo(user=user, bio=bio)
+            profile_pic = user_form.cleaned_data.get('profile_pic')
+            profile = UserProfileInfo(user=user, bio=bio, profile_pic=profile_pic)
             profile.save()
             registered = True
         else:
@@ -51,7 +52,7 @@ def home(request):
         if user:
             login(request, user)
             user_pref = UserProfileInfo.objects.get(user=user)
-            return render(request, 'core/home.html', {'bio': user_pref.bio})
+            return render(request, 'core/home.html', {'bio': user_pref.bio, 'pic': user_pref.profile_pic})
         else:
             return HttpResponse("Invalid login details given")
     else:

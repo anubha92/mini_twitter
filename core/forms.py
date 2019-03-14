@@ -1,5 +1,4 @@
 from django import forms
-from .models import User, Tweet, UserProfileInfo
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
@@ -9,9 +8,10 @@ class UserCreationForm(forms.ModelForm):
     password2 = forms.CharField(label=("Password confirmation"), widget=forms.PasswordInput,
                                 help_text=("Enter the same password as above, for verification."))
     bio = forms.CharField(label=("Tell us about yourself"), max_length=200)
+    profile_pic = forms.ImageField(label=("Profile Picture"))
     class Meta():
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'bio')
+        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'bio', 'profile_pic')
 
     def save(self, commit=True):
         user = super(UserCreationForm, self).save(commit=False)
@@ -36,3 +36,4 @@ class UserCreationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
