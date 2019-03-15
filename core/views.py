@@ -35,7 +35,6 @@ def register(request):
         user_form = CreateUserForm(request.POST, request.FILES)
         if user_form.is_valid():
             username, password = user_form.cleaned_data.get('username'), user_form.cleaned_data.get('password1')
-            print(password)
             bio = user_form.cleaned_data.get('bio')
             profile_pic = user_form.cleaned_data.get('profile_pic')
             user = User.objects.create_user(username, password=password)
@@ -49,7 +48,7 @@ def register(request):
         else:
             print(user_form.errors)
     else:
-        user_form = UserCreationForm()
+        user_form = CreateUserForm()
     return render(request, 'core/registration.html',
                   {'user_form': user_form,
                    'registered': registered})
