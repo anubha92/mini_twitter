@@ -136,16 +136,15 @@ def timeline(request):
 
 
 def edit_bio(request):
+    user = request.user
+    user_prof = UserProfileInfo.objects.get(user=user)
     if request.method == 'POST':
-        user = request.user
         updated_bio = request.POST.get('updated_bio')
-        user_prof = UserProfileInfo.objects.get(user=user)
         user_prof.bio = updated_bio
         user_prof.save()
         return HttpResponse("Bio has been updated")
     else:
-        return render(request, 'core/edit_bio.html', {})
-
+        return render(request, 'core/edit_bio.html', {'current_bio': user_prof.bio})
 
 def search_tweet(request):
     if request.method == 'GET':
