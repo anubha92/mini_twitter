@@ -153,6 +153,4 @@ def search_tweet(request):
             return render(request, 'core/search_in_tweet.html', {'tweets': tweets})
         else:
             return render(request, 'core/search_in_tweet.html', {})
-    else:
-        return render(request, 'core/search_in_tweet.html', {})
 
