@@ -125,10 +125,14 @@ def get_following(request,userid):
 def timeline(request):
     total_tweets = Tweet.objects.filter(Q(user=request.user) |
                                         Q(user__in=request.user.following.values_list('follow', flat=True)))
-    paginator = Paginator(total_tweets, 3)
-    page = request.GET.get('page')
-    my_tweets = paginator.get_page(page)
+    try:
+        paginator = Paginator(total_tweets, 3, allow_empty_first_page=False)
+        page = request.GET.get('page')
+        my_tweets = paginator.get_page(page)
+    except:
+        return HttpResponse("No Tweet to show")
     return render(request, 'core/timeline.html', {'my_tweets': my_tweets})
+
 
 
 def edit_bio(request):
