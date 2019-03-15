@@ -79,27 +79,19 @@ def search_profile(request):
 
 def get_profile(request, userid):
     followed = False
-    u = UserProfileInfo.objects.get(user_id=userid)
-    t = Tweet.objects.filter(user_id=userid)
-    data = FollowRelation.objects.filter(follow=User(u.user_id), user=request.user).count()
-    if data == 0:
-        if request.method == 'POST':
-            f = FollowRelation( follow=User(u.user_id), user=request.user)
+    user = UserProfileInfo.objects.get(user_id=userid)
+    tweets = Tweet.objects.filter(user_id=userid)
+    follow_count = FollowRelation.objects.filter(follow=User(user.user_id), user=request.user).count()
+    if request.method == 'POST':
+        if follow_count == 0:  # to follow, create a user in FollowRelation
+            f = FollowRelation(follow=User(user.user_id), user=request.user)
             f.save()
-            followed = True
-            return render(request, 'core/profile.html',
-                                  {'profile_user': u, 'all_tweets': t, 'followed': followed, 'me':request.user})
-        else:
-            followed = False
-            return render(request, 'core/profile.html', {'profile_user': u, 'all_tweets': t, 'followed': followed, 'me':request.user})
-    else:
-        if request.method == 'POST':
-            FollowRelation.objects.filter(follow=User(u.user_id), user=request.user).delete()
-            followed = False
-            return render(request, 'core/profile.html', {'profile_user': u, 'all_tweets': t, 'followed': followed, 'me':request.user})
-        else:
-            followed = False
-            return render(request, 'core/profile.html', {'profile_user': u, 'all_tweets': t, 'followed': followed, 'me':request.user})
+        else:  #to unfollow, delete the user from FollowRelation
+            FollowRelation.objects.filter(follow=User(user.user_id), user=request.user).delete()
+    follow_count = FollowRelation.objects.filter(follow=User(user.user_id), user=request.user).count()
+    return render(request, 'core/profile.html', {'profile_user': user, 'all_tweets': tweets, 'follow_count': follow_count, 'me': request.user})
+
+
 
 def post_like(request, tweet_id):
     u = request.user
