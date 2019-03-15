@@ -15,7 +15,7 @@ from django.urls import reverse
 
 
 # local imports
-from .forms import  UserCreationForm, User
+from .forms import  CreateUserForm, User
 from .models import FollowRelation, Tweet, TweetLike,  UserProfileInfo
 
 
@@ -32,14 +32,19 @@ def user_logout(request):
 def register(request):
     registered = False
     if request.method == 'POST':
-        user_form = UserCreationForm(request.POST, request.FILES)
+        user_form = CreateUserForm(request.POST, request.FILES)
         if user_form.is_valid():
-            user = user_form.save()
-            user.save()
+            username, password = user_form.cleaned_data.get('username'), user_form.cleaned_data.get('password1')
+            print(password)
             bio = user_form.cleaned_data.get('bio')
             profile_pic = user_form.cleaned_data.get('profile_pic')
-            profile = UserProfileInfo(user=user, bio=bio, profile_pic=profile_pic)
-            profile.save()
+            user = User.objects.create_user(username, password=password)
+            user.save()
+            try:
+                profile = UserProfileInfo(user=user, bio=bio, profile_pic=profile_pic)
+                profile.save()
+            except IntegrityError:
+                transaction.rollback()
             registered = True
         else:
             print(user_form.errors)
