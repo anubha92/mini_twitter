@@ -3,7 +3,7 @@
   <div class="container">
     <div class="jumbotron">
       <h1>Search here :</h1>
-<form method="post" action="{% url 'core:home' %}">
+<form method="POST">
           {% csrf_token %}
 <label for="search">List of users:</label>
           {% for u in user_list %}
