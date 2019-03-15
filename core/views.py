@@ -1,17 +1,23 @@
-from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect, HttpResponse
-from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
-from django.db import IntegrityError
+
 from django.core.paginator import Paginator
 
-from core.models import Tweet, FollowRelation, UserProfileInfo, TweetLike
-from core.forms import User, UserCreationForm
+from django.db.models import Q
+from django.db import IntegrityError
+from django.db import transaction
+
+from django.http import HttpResponseRedirect, HttpResponse
+
+from django.shortcuts import render
+
+from django.urls import reverse
 
 
-# Create your views here.
+# local imports
+from .forms import  UserCreationForm, User
+from .models import FollowRelation, Tweet, TweetLike,  UserProfileInfo
+
 
 def index(request):
     return render(request, 'core/index.html')
@@ -22,7 +28,7 @@ def user_logout(request):
     logout(request)
     return HttpResponseRedirect(reverse('index'))
 
-
+@transaction.atomic()
 def register(request):
     registered = False
     if request.method == 'POST':
@@ -58,18 +64,17 @@ def home(request):
     else:
         return render(request, 'core/login.html', {})
 
+
 def post_tweet(request):
-    u = request.user
+    user = request.user
     if request.method == 'POST':
         new_tweet = request.POST.get('submit_tweet')
-        t = Tweet.objects.create(contents=new_tweet, user=u)
-        tweets_all = u.tweets.all()
+        Tweet.objects.create(contents=new_tweet, user=user)
+        tweets_all = user.tweets.all()
         return render(request, 'core/mytweets.html',{'tweets_all':tweets_all})
     else:
-        tweets_all = u.tweets.all()
+        tweets_all = user.tweets.all()
         return render(request, 'core/mytweets.html',{'tweets_all':tweets_all})
-
-
 
 
 def search_profile(request):
@@ -86,56 +91,57 @@ def get_profile(request, userid):
         if follow_count == 0:  # to follow, create a user in FollowRelation
             f = FollowRelation(follow=User(user.user_id), user=request.user)
             f.save()
-        else:  #to unfollow, delete the user from FollowRelation
+        else:  # to unfollow, delete the user from FollowRelation
             FollowRelation.objects.filter(follow=User(user.user_id), user=request.user).delete()
     follow_count = FollowRelation.objects.filter(follow=User(user.user_id), user=request.user).count()
-    return render(request, 'core/profile.html', {'profile_user': user, 'all_tweets': tweets, 'follow_count': follow_count, 'me': request.user})
-
+    return render(request, 'core/profile.html', {'profile_user': user, 'all_tweets': tweets,
+                                                 'follow_count': follow_count, 'me': request.user})
 
 
 def post_like(request, tweet_id):
-    u = request.user
-    t = Tweet.objects.get(id=tweet_id)
+    user = request.user
+    tweet = Tweet.objects.get(id=tweet_id)
     try:
-        new_t = TweetLike.objects.create(tweet=t, liked_by=u )
-        new_t.save()
+        new_tweet_like = TweetLike.objects.create(tweet=tweet, liked_by=user )
+        new_tweet_like.save()
     except IntegrityError:
         return HttpResponse("already liked")
-    all_likes = TweetLike.objects.filter(tweet=t)
-    return render(request, 'core/tweets_liked_by.html', {'all_likes': all_likes, 'tweet':t})
-
+    all_likes = TweetLike.objects.filter(tweet=tweet)
+    return render(request, 'core/tweets_liked_by.html', {'all_likes': all_likes, 'tweet': tweet})
 
 
 def get_followers(request, userid):
     user_profile = UserProfileInfo.objects.get(user_id=userid)
-    u = User.objects.get(username=user_profile.user.username)
-    return render(request, 'core/follower.html', {'all_followers':u.followed.all(), 'profile_user':u})
+    user = User.objects.get(username=user_profile.user.username)
+    return render(request, 'core/follower.html', {'all_followers': user.followed.all(), 'profile_user': user})
 
 
 def get_following(request,userid):
     user_profile = UserProfileInfo.objects.get(user_id=userid)
-    u = User.objects.get(username=user_profile.user.username)
-    return render(request, 'core/following.html', {'all_following':u.following.all(), 'profile_user':user_profile })
+    user = User.objects.get(username=user_profile.user.username)
+    return render(request, 'core/following.html', {'all_following': user.following.all(), 'profile_user': user_profile})
 
 
 def timeline(request):
-    total_tweets = Tweet.objects.filter(Q(user=request.user) | Q(user__in=request.user.following.values_list('follow', flat=True)))
+    total_tweets = Tweet.objects.filter(Q(user=request.user) |
+                                        Q(user__in=request.user.following.values_list('follow', flat=True)))
     paginator = Paginator(total_tweets, 3)
     page = request.GET.get('page')
     my_tweets = paginator.get_page(page)
-    return render(request, 'core/timeline.html',{'my_tweets': my_tweets})
+    return render(request, 'core/timeline.html', {'my_tweets': my_tweets})
 
 
 def edit_bio(request):
     if request.method == 'POST':
-        u = request.user
+        user = request.user
         updated_bio = request.POST.get('updated_bio')
-        b = UserProfileInfo.objects.get(user=u)
-        b.bio = updated_bio
-        b.save()
+        user_prof = UserProfileInfo.objects.get(user=user)
+        user_prof.bio = updated_bio
+        user_prof.save()
         return HttpResponse("Bio has been updated")
     else:
         return render(request, 'core/edit_bio.html', {})
+
 
 def search_tweet(request):
     if request.method == 'GET':

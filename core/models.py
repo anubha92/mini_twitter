@@ -1,13 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import User
-from django.core.files.storage import FileSystemStorage
-from django.conf import settings
+from django.db import models
 
 # Create your models here.
 
-def user_directory_path(instance, filename):
-    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'core/{1}'.format(instance, filename)
 
 class UserProfileInfo(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
@@ -35,11 +30,11 @@ class FollowRelation(models.Model):
     follow = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followed')
 
     def __str__(self):
-        return str(self.user) +  str(self.follow)
+        return str(self.user) + str(self.follow)
 
 
 class TweetLike(models.Model):
-    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE, related_name = 'likes')
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE, related_name='likes')
     liked_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
 
     def __str__(self):
