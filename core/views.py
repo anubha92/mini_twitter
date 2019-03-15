@@ -146,10 +146,13 @@ def edit_bio(request):
         return render(request, 'core/edit_bio.html', {})
 
 def search_tweet(request):
-    if request.method == 'POST':
-        lookup_word = request.POST.get('search_word')
-        tweets = Tweet.objects.filter(contents__icontains=lookup_word)
-        return render(request, 'core/search_in_tweet.html', {'tweets': tweets})
+    if request.method == 'GET':
+        lookup_word = request.GET.get('search_word', None)
+        if lookup_word:
+            tweets = Tweet.objects.filter(contents__icontains=lookup_word)
+            return render(request, 'core/search_in_tweet.html', {'tweets': tweets})
+        else:
+            return render(request, 'core/search_in_tweet.html', {})
     else:
         return render(request, 'core/search_in_tweet.html', {})
 
