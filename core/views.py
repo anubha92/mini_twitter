@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.db import IntegrityError
 from django.core.paginator import Paginator
+from django.contrib.postgres.search import SearchQuery, SearchVector
 
 from core.models import Tweet, FollowRelation, UserProfileInfo, TweetLike
 from core.forms import User, UserCreationForm
@@ -150,6 +151,19 @@ def search_tweet(request):
         lookup_word = request.POST.get('search_word')
         tweets = Tweet.objects.filter(contents__icontains=lookup_word)
         return render(request, 'core/search_in_tweet.html', {'tweets': tweets})
+    else:
+        return render(request, 'core/search_in_tweet.html', {})
+
+
+def search_tweet_full_text(request):
+    if request.method == 'POST':
+        keywords = request.POST.get('search_word')
+        qs = Tweet.objects.all()
+        if keywords:
+            query = SearchQuery(keywords)
+            vector = SearchVector('contents')
+            qs = qs.annotate(search=vector).filter(search=query)
+            return render(request, 'core/search_in_tweet.html', {'tweets': qs})
     else:
         return render(request, 'core/search_in_tweet.html', {})
 
