@@ -8,7 +8,7 @@
   <form method="post" action="{% url 'core:get_profile' userid=profile_user.user_id %}">
       {% csrf_token %}
   {%  ifnotequal profile_user.user  me  %}
-      {% if followed %}
+      {% if follow_count == 1 %}
           <button>UNFOLLOW</button>
       {% else %}
         <button>FOLLOW</button>

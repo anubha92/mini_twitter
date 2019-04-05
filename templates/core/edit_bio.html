@@ -2,6 +2,7 @@
 {% block body_block %}
 <div class="container" xmlns="http://www.w3.org/1999/html">
   <div class="jumbotron">
+      <h4>Current bio : {{ current_bio }}</h4>
   <form method="POST" action="{% url 'core:edit_bio' %}">
       {% csrf_token %}
       <input type="text" name="updated_bio" value="">

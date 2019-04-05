@@ -3,8 +3,7 @@
 <div class="container" xmlns="http://www.w3.org/1999/html">
   <div class="jumbotron">
   <h3>Enter the word you want related tweets for:</h3>
-  <form method="POST" action="{% url 'core:search_tweet' %}">
-      {% csrf_token %}
+  <form method="GET" action="{% url 'core:search_tweet' %}">
       <input type="text" name="search_word" value="">
       <input type="submit" name="" value="submit">
   </form>
