@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 
 
 from django.db.models import Q
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.core.paginator import Paginator
 from django.contrib.postgres.search import SearchQuery, SearchVector
 from django.http import HttpResponseRedirect, HttpResponse
@@ -13,7 +13,7 @@ from django.urls import reverse
 
 # local imports
 from .forms import  CreateUserForm, User
-from .models import FollowRelation, Tweet, TweetLike,  UserProfileInfo
+from .models import FollowRelation, Tweet, TweetLike, TweetWord,  UserProfileInfo
 
 
 def index(request):
@@ -70,8 +70,11 @@ def post_tweet(request):
     user = request.user
     if request.method == 'POST':
         new_tweet = request.POST.get('submit_tweet')
-        Tweet.objects.create(contents=new_tweet, user=user)
+        tweet = Tweet.objects.create(contents=new_tweet, user=user)
         tweets_all = user.tweets.all()
+        tweet_list = new_tweet.split()
+        for t in tweet_list:
+            TweetWord.objects.create(words=t, tweet_id=tweet)
         return render(request, 'core/mytweets.html',{'tweets_all':tweets_all})
     else:
         tweets_all = user.tweets.all()
@@ -156,7 +159,7 @@ def search_tweet(request):
         else:
             return render(request, 'core/search_in_tweet.html', {})
 
-
+    '''
 def search_tweet_full_text(request):
     if request.method == 'POST':
         keywords = request.POST.get('search_word')
@@ -168,4 +171,13 @@ def search_tweet_full_text(request):
             return render(request, 'core/search_in_tweet.html', {'tweets': qs})
     else:
         return render(request, 'core/search_in_tweet.html', {})
+    '''
 
+
+def search_tweet_full_text(request):
+    if request.method == 'GET':
+        lookup_word = request.GET.get('search_word')
+        qs = TweetWord.objects.filter(words=lookup_word).values_list('tweet_id__contents', 'tweet_id__user__username')
+        return render(request, 'core/search_in_tweet.html', {'tweets': qs})
+    else:
+        return render(request, 'core/search_in_tweet.html', {})

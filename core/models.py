@@ -42,3 +42,8 @@ class TweetLike(models.Model):
 
     class Meta:
         unique_together = ("tweet", "liked_by")
+
+class TweetWord(models.Model):
+    words = models.CharField(max_length=120, db_index=True)
+    tweet_id = models.ForeignKey(Tweet, on_delete=models.CASCADE)
+
