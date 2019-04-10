@@ -16,18 +16,11 @@ class UserProfileInfo(models.Model):
         return str(self.user.username) + str(self.bio)
 
 
-class TweetManager(models.Manager):
-    def create_documents(self):
-        vector = SearchVector('contents')
-        return self.get_queryset().annotate(document=vector)
-
-
 class Tweet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tweets')
     contents = models.CharField(max_length=120)
     published_time = models.DateTimeField(auto_now_add=True)
     search_vector = SearchVectorField(null=True)
-    objects = TweetManager()
 
     def __str__(self):
         return str(self.contents) + str(self.published_time)
@@ -40,10 +33,8 @@ class Tweet(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if 'update_fields' not in kwargs or 'search_vector' not in kwargs['update_fields']:
-            instance_doc = Tweet.objects.create_documents().get(pk=self.pk)
-            instance_doc.search_vector = instance_doc.document
-            instance_doc.save(update_fields=['search_vector'])
+        Tweet.objects.update(search_vector=SearchVector('contents'))
+
 
 class FollowRelation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
@@ -63,7 +54,5 @@ class TweetLike(models.Model):
     class Meta:
         unique_together = ("tweet", "liked_by")
 
-class TweetWord(models.Model):
-    words = models.CharField(max_length=120, db_index=True)
-    #tweet_id = models.ForeignKey(Tweet, on_delete=models.CASCADE)
+
 
