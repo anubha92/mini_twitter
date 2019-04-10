@@ -2,10 +2,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 
-from django.db.models import Q
+from django.db.models import Q, F
 from django.db import IntegrityError, transaction
 from django.core.paginator import Paginator
-from django.contrib.postgres.search import SearchQuery, SearchVector
+from django.contrib.postgres.search import SearchQuery, SearchVector, SearchRank
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -72,9 +72,6 @@ def post_tweet(request):
         new_tweet = request.POST.get('submit_tweet')
         tweet = Tweet.objects.create(contents=new_tweet, user=user)
         tweets_all = user.tweets.all()
-        tweet_list = new_tweet.split()
-        for t in tweet_list:
-            TweetWord.objects.create(words=t, tweet_id=tweet)
         return render(request, 'core/mytweets.html',{'tweets_all':tweets_all})
     else:
         tweets_all = user.tweets.all()
@@ -161,8 +158,8 @@ def search_tweet(request):
 
     '''
 def search_tweet_full_text(request):
-    if request.method == 'POST':
-        keywords = request.POST.get('search_word')
+    if request.method == 'GET':
+        keywords = request.GET.get('search_word')
         qs = Tweet.objects.all()
         if keywords:
             query = SearchQuery(keywords)
@@ -176,8 +173,10 @@ def search_tweet_full_text(request):
 
 def search_tweet_full_text(request):
     if request.method == 'GET':
+        qs = Tweet.objects.all()
         lookup_word = request.GET.get('search_word')
-        qs = TweetWord.objects.filter(words=lookup_word).values_list('tweet_id__contents', 'tweet_id__user__username')
+        query = SearchQuery(lookup_word)
+        qs = qs.filter(search_vector=query).values_list('contents', 'user__username')
         return render(request, 'core/search_in_tweet.html', {'tweets': qs})
     else:
         return render(request, 'core/search_in_tweet.html', {})
