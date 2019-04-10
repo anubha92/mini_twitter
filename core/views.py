@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 
-from django.db.models import Q, F
+from django.db.models import Q
 from django.db import IntegrityError, transaction
 from django.core.paginator import Paginator
 from django.contrib.postgres.search import SearchQuery, SearchVector, SearchRank
@@ -13,7 +13,7 @@ from django.urls import reverse
 
 # local imports
 from .forms import  CreateUserForm, User
-from .models import FollowRelation, Tweet, TweetLike, TweetWord,  UserProfileInfo
+from .models import FollowRelation, Tweet, TweetLike,UserProfileInfo
 
 
 def index(request):
@@ -175,7 +175,7 @@ def search_tweet_full_text(request):
     if request.method == 'GET':
         qs = Tweet.objects.all()
         lookup_word = request.GET.get('search_word')
-        query = SearchQuery(lookup_word)
+        query = SearchQuery(lookup_word, config='english')
         qs = qs.filter(search_vector=query).values_list('contents', 'user__username')
         return render(request, 'core/search_in_tweet.html', {'tweets': qs})
     else:

@@ -1,5 +1,6 @@
 from django.contrib.postgres.search import SearchVectorField
 from django.contrib.postgres.indexes import GinIndex
+from django.db.models import F
 from django.contrib.postgres.search import SearchVector
 from django.contrib.auth.models import User
 from django.db import models
@@ -33,8 +34,7 @@ class Tweet(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        Tweet.objects.update(search_vector=SearchVector('contents'))
-
+        Tweet.objects.update(search_vector=SearchVector('contents', config='english'))
 
 class FollowRelation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
