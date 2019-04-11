@@ -90,8 +90,8 @@ WSGI_APPLICATION = 'mini_twitter.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'twitterd',
-        'USER': 'mytwitterd_user',
+        'NAME': 'tweet',
+        'USER': 'tweet_user',
         'PASSWORD': 'password',
         'HOST': 'localhost',
         'PORT': '',

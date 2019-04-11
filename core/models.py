@@ -19,7 +19,7 @@ class UserProfileInfo(models.Model):
 
 class Tweet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tweets')
-    contents = models.CharField(max_length=120)
+    contents = models.CharField(max_length=4000)
     published_time = models.DateTimeField(auto_now_add=True)
     search_vector = SearchVectorField(null=True)
 
